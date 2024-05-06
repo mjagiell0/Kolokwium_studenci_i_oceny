@@ -87,9 +87,33 @@ int read_students_grades(const char *filename, struct student_t ***students) {
             *(arr + student_count) = student;
             student_count++;
             *(arr + student_count) = NULL;
-        }else{
-            struct course_grades_t *students_course = search_course(course,student->courses,student->number_of_courses);
+        } else {
+            struct course_grades_t *students_course = search_course(course, student->courses,
+                                                                    student->number_of_courses);
+            if (!students_course) {
+                struct course_grades_t *tmp = realloc(student->courses, (student->number_of_courses + 1) *
+                                                                        sizeof(struct course_grades_t));
+                if (!tmp) {
+                    free_students_grades(arr);
+                    fclose(f);
+                    return -4;
+                }
+                student->courses = tmp;
 
+                strcpy((student->courses + student->number_of_courses)->course, course);
+                (student->courses + student->number_of_courses)->number_of_grades = 1;
+
+                (student->courses + student->number_of_courses)->grades = calloc(1, sizeof(int));
+                if (!(student->courses + student->number_of_courses)->grades) {
+                    free_students_grades(arr);
+                    fclose(f);
+                    return -4;
+                }
+
+                *(student->courses + student->number_of_courses)->grades = grade;
+
+                student->number_of_courses++;
+            }
         }
 
     }
@@ -130,12 +154,13 @@ const struct student_t *search_student(const char *name, const char *last_name, 
     return NULL;
 }
 
-const struct course_grades_t *search_course(const char *course, const struct course_grades_t *courses, unsigned long long N){
-    if(!courses)
+const struct course_grades_t *
+search_course(const char *course, const struct course_grades_t *courses, unsigned long long N) {
+    if (!courses)
         return NULL;
 
-    for (int i = 0; i < (int)N; ++i)
-        if(!strcmp(course,(courses + i)->course))
+    for (int i = 0; i < (int) N; ++i)
+        if (!strcmp(course, (courses + i)->course))
             return (courses + i);
 
     return NULL;
