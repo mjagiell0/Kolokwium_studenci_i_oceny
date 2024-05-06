@@ -113,12 +113,24 @@ int read_students_grades(const char *filename, struct student_t ***students) {
                 *(student->courses + student->number_of_courses)->grades = grade;
 
                 student->number_of_courses++;
+            } else {
+                int *tmp = realloc(students_course->grades, (students_course->number_of_grades + 1) * sizeof(int));
+                if (!students_course->grades) {
+                    free_students_grades(arr);
+                    fclose(f);
+                    return -4;
+                }
+                students_course->grades = tmp;
+
+                *(students_course + students_course->number_of_grades)->grades = grade;
+                students_course->number_of_grades++;
             }
         }
 
     }
 
     *students = arr;
+    fclose(f);
 
     return 0;
 }
