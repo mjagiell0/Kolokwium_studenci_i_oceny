@@ -84,7 +84,8 @@ int read_students_grades(const char *filename, struct student_t ***students) {
             arr = tmp;
 
             *(arr + student_count) = student;
-            *(arr + student_count + 1) = NULL;
+            student_count++;
+            *(arr + student_count) = NULL;
         }
 
     }
