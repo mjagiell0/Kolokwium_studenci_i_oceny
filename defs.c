@@ -122,7 +122,7 @@ int read_students_grades(const char *filename, struct student_t ***students) {
                 }
                 students_course->grades = tmp;
 
-                *(students_course + students_course->number_of_grades)->grades = grade;
+                *(students_course->grades + students_course->number_of_grades) = grade;
                 students_course->number_of_grades++;
             }
         }
