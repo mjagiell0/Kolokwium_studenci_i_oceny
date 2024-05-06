@@ -126,3 +126,14 @@ const struct student_t *search_student(const char *name, const char *last_name, 
 
     return NULL;
 }
+
+const struct course_grades_t *search_course(const char *course, const struct course_grades_t *courses, int N){
+    if(!courses)
+        return NULL;
+
+    for (int i = 0; i < N; ++i)
+        if(!strcmp(course,(courses + i)->course))
+            return (courses + i);
+
+    return NULL;
+}
