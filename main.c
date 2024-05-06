@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include "defs.h"
 
 int main(void) {
-    printf("Hello, World!\n");
+    struct student_t **students = NULL;
+    read_students_grades("test.txt", &students);
     return 0;
 }
