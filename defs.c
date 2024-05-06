@@ -3,7 +3,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-void free_students_grades(struct student_t **students);
+void free_students_grades(struct student_t **students){
+    if(!students)
+        return;
+
+    for (int i = 0; *(students + i); ++i) {
+        free((*(students + i))->courses->grades);
+        free((*(students + i))->courses);
+        free((*(students + i)));
+    }
+
+    free(students);
+}
 
 int read_students_grades(const char *filename, struct student_t ***students) {
     if (!filename || !students)
@@ -14,6 +25,7 @@ int read_students_grades(const char *filename, struct student_t ***students) {
         return -2;
 
     struct student_t **arr = NULL;
+    unsigned int student_count = 0;
 
     while (!feof(f)) {
         char name[21], last_name[41], course[43];
@@ -26,7 +38,58 @@ int read_students_grades(const char *filename, struct student_t ***students) {
             return -3;
         }
 
+        struct student_t *student = (struct student_t *) search_student(name, last_name,(const struct student_t **) arr);
+        if(!student){
+            student = calloc(1, sizeof(struct student_t));
+            if(!student){
+                free_students_grades(arr);
+                fclose(f);
+                return -4;
+            }
+
+            strcpy(student->name,name);
+            strcpy(student->last_name,last_name);
+            student->number_of_courses = 1;
+
+            student->courses = calloc(1, sizeof(struct course_grades_t));
+            if(!student->courses){
+                free_students_grades(arr);
+                free(student);
+                fclose(f);
+                return -4;
+            }
+
+            strcpy(student->courses->course,course);
+            student->courses->number_of_grades = 1;
+
+            student->courses->grades = calloc(1, sizeof(int));
+            if(!student->courses->grades){
+                free_students_grades(arr);
+                free(student->courses);
+                free(student);
+                fclose(f);
+                return -4;
+            }
+
+            *student->courses->grades=grade;
+
+            struct student_t **tmp = realloc(arr,(student_count + 2) * sizeof(struct student_t *));
+            if(!tmp){
+                free_students_grades(arr);
+                free(student->courses);
+                free(student);
+                fclose(f);
+                return -4;
+            }
+            arr = tmp;
+
+            *(arr + student_count) = student;
+            *(arr + student_count + 1) = NULL;
+        }
+
     }
+
+    *students = arr;
 
     return 0;
 }
