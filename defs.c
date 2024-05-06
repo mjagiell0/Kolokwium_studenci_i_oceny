@@ -87,6 +87,9 @@ int read_students_grades(const char *filename, struct student_t ***students) {
             *(arr + student_count) = student;
             student_count++;
             *(arr + student_count) = NULL;
+        }else{
+            struct course_grades_t *students_course = search_course(course,student->courses,student->number_of_courses);
+
         }
 
     }
@@ -127,11 +130,11 @@ const struct student_t *search_student(const char *name, const char *last_name, 
     return NULL;
 }
 
-const struct course_grades_t *search_course(const char *course, const struct course_grades_t *courses, int N){
+const struct course_grades_t *search_course(const char *course, const struct course_grades_t *courses, unsigned long long N){
     if(!courses)
         return NULL;
 
-    for (int i = 0; i < N; ++i)
+    for (int i = 0; i < (int)N; ++i)
         if(!strcmp(course,(courses + i)->course))
             return (courses + i);
 
